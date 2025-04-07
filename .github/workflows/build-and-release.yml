@@ -22,7 +22,7 @@ jobs:
       - name: Build backend with Maven
         run: |
           cd back
-          mvn clean package -DskipTests -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
+          mvn clean package -DskipTests -Dmaven.compiler.release=8
       
       - name: Get project version
         id: get_version
