@@ -142,7 +142,9 @@ public class QLService implements ITask {
             }
             envs.forEach(env -> {
                 String remark = env.getString("remarks");
-                Set<String> newRemarkSplit = StrUtil.split(remark, "@@").stream().filter(e -> !StrUtil.startWith(e, "UID_") && StrUtil.isNotBlank(e)).collect(Collectors.toSet());
+                List<String> newRemarkSplit = StrUtil.split(remark, "@@").stream()
+                        .filter(e -> !StrUtil.startWith(e, "UID_") && StrUtil.isNotBlank(e))
+                        .collect(Collectors.toList());
                 newRemarkSplit.add(uid);
                 if (newRemarkSplit.size() <= 1) {
                     newRemarkSplit.add(ptPin);
