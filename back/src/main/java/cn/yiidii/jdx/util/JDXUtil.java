@@ -4,7 +4,7 @@ import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties.QLConfig;
 import cn.yiidii.jdx.model.ex.BizException;
-import com.sun.org.apache.regexp.internal.RE;
+import org.apache.regexp.RE;
 import java.util.Arrays;
 import lombok.experimental.UtilityClass;
 
