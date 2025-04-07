@@ -78,11 +78,7 @@
             <artifactId>quartz</artifactId>
             <version>${quartz.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.regexp</groupId>
-            <artifactId>regexp</artifactId>
-            <version>1.5</version>
-        </dependency>
+
     </dependencies>
 
     <build>
@@ -109,11 +105,5 @@
             </plugin>
         </plugins>
     </build>
-        <repositories>
-            <repository>
-                <id>jboss-public-repository-group</id>
-                <name>JBoss Public Repository Group</name>
-                <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-            </repository>
-        </repositories>
+
 </project>
