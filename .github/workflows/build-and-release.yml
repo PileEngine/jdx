@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '8'  # 根据您的项目需求调整
+          java-version: '7'  # 根据您的项目需求调整
           cache: 'maven'
       
       - name: Build backend with Maven
