@@ -1,9 +1,11 @@
-name: Build JAR and Release
+name: Build and Release JDX
 
 on:
   push:
-    branches: [ main, master ]  # 当推送到这些分支时触发
-  workflow_dispatch:  # 允许手动触发
+    branches:
+      - main
+      - master
+  workflow_dispatch:
 
 jobs:
   build:
@@ -11,35 +13,35 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
-      - name: Set up JDK
+
+      - name: Set up JDK 8
         uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
-          java-version: '8'  # 根据您的项目需求调整
+          distribution: 'adoptopenjdk'
+          java-version: '8'
           cache: 'maven'
-      
-      - name: Build backend with Maven
+
+      - name: Build with Maven
         run: |
           cd back
           mvn clean package -DskipTests -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
-      
+
       - name: Get project version
         id: get_version
         run: |
-          echo "VERSION=$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-      
+          echo "VERSION=$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.get_version.outputs.VERSION }}
-          release_name: Release v${{ steps.get_version.outputs.VERSION }}
+          tag_name: v${{ env.VERSION }}
+          release_name: Release v${{ env.VERSION }}
           draft: false
           prerelease: false
-      
+
       - name: Upload JAR to Release
         uses: actions/upload-release-asset@v1
         env:
@@ -47,5 +49,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./back/target/jdx.jar
-          asset_name: jdx-${{ steps.get_version.outputs.VERSION }}.jar
+          asset_name: jdx-${{ env.VERSION }}.jar
           asset_content_type: application/java-archive
