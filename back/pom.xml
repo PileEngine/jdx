@@ -78,7 +78,11 @@
             <artifactId>quartz</artifactId>
             <version>${quartz.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.regexp</groupId>
+            <artifactId>regexp</artifactId>
+            <version>1.5</version>
+        </dependency>
     </dependencies>
 
     <build>
