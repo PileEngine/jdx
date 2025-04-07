@@ -145,10 +145,11 @@ public class QLService implements ITask {
                 List<String> newRemarkSplit = StrUtil.split(remark, "@@").stream()
                         .filter(e -> !StrUtil.startWith(e, "UID_") && StrUtil.isNotBlank(e))
                         .collect(Collectors.toList());
-                newRemarkSplit.add(uid);
-                if (newRemarkSplit.size() <= 1) {
-                    newRemarkSplit.add(ptPin);
-                }
+                
+                // 确保 ptPin 在前，uid 在后
+                newRemarkSplit.add(0, ptPin);  // 将 ptPin 放到第一个位置
+                newRemarkSplit.add(uid);       // 将 uid 添加到最后
+                
                 String newRemark = CollUtil.join(newRemarkSplit, "@@");
                 env.put("remarks", newRemark);
                 this.updateEnv(qlConfig, env);
