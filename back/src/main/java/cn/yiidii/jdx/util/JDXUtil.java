@@ -4,8 +4,9 @@ import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties.QLConfig;
 import cn.yiidii.jdx.model.ex.BizException;
-import com.sun.org.apache.regexp.internal.RE;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -33,5 +34,13 @@ public class JDXUtil {
         return StrUtil.split(remark, "@@").stream().filter(e -> StrUtil.startWith(e, "UID_")).findFirst().orElse("");
     }
 
-
+    /**
+     * 替换原来的正则表达式逻辑
+     * 这里模拟原来 RE 类的功能
+     */
+    public boolean matchesPattern(String input, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        return matcher.find();
+    }
 }
