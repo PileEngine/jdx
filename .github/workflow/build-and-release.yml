@@ -1,0 +1,51 @@
+name: Build JAR and Release
+
+on:
+  push:
+    branches: [ main, master ]  # 当推送到这些分支时触发
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '11'  # 根据您的项目需求调整
+          cache: 'maven'
+      
+      - name: Build backend with Maven
+        run: |
+          cd back
+          mvn clean package -DskipTests
+      
+      - name: Get project version
+        id: get_version
+        run: |
+          echo "VERSION=$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.get_version.outputs.VERSION }}
+          release_name: Release v${{ steps.get_version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+      
+      - name: Upload JAR to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./back/target/jdx.jar
+          asset_name: jdx-${{ steps.get_version.outputs.VERSION }}.jar
+          asset_content_type: application/java-archive
