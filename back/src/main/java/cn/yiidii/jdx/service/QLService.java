@@ -217,45 +217,34 @@ public class QLService implements ITask {
     }
 
     public void updateEnv(QLConfig qlConfig, JSONObject envJo) {
-    // 移除状态字段
-    envJo.remove("status");
-    
-    // 获取环境变量的id
-    String id = envJo.getString("id");
-    String displayName = qlConfig.getDisplayName();
-    
-    // 第一次尝试：使用 "id"
-    log.debug(StrUtil.format("[青龙 - {}] 第一次尝试更新环境变量, 参数: {}", displayName, envJo.toJSONString()));
-    HttpResponse response = HttpRequest.put(qlConfig.getUrl().concat("open/envs"))
-            .bearerAuth(this.getQLToken(displayName))
-            .body(envJo.toJSONString())
-            .execute();
-    
-    log.debug(StrUtil.format("[青龙 - {}] 更新环境变量, 状态码: {}, 响应: {}", displayName, response.getStatus(), response.body()));
-
-    // 如果第一次更新失败（内部错误），则尝试第二次使用 "_id"
-    if (response.getStatus() == HttpStatus.HTTP_INTERNAL_ERROR) {
-        // 移除 "id"，并替换为 "_id"
-        envJo.remove("id");
-        envJo.put("_id", id);
-        
-        log.debug(StrUtil.format("[青龙 - {}] 第二次尝试更新环境变量, 参数: {}", displayName, envJo.toJSONString()));
-        
-        // 重新发送 HTTP 请求
-        response = HttpRequest.put(qlConfig.getUrl().concat("open/envs"))
+        envJo.remove("status");
+        String id = envJo.getString("id");
+        String displayName = qlConfig.getDisplayName();
+        // 第一次，用_id
+        envJo.remove("_id");
+        envJo.put("id", id);
+        log.debug(StrUtil.format("[青龙 - {}] 第一次尝试更新环境变量, 参数: {}", displayName, envJo.toJSONString()));
+        HttpResponse response = HttpRequest.put(qlConfig.getUrl().concat("open/envs"))
                 .bearerAuth(this.getQLToken(displayName))
                 .body(envJo.toJSONString())
                 .execute();
-        
-        log.debug(StrUtil.format("[青龙 - {}] 第二次尝试更新环境变量, 状态码: {}, 响应: {}", displayName, response.getStatus(), response.body()));
-    }
+        log.debug(StrUtil.format("[青龙 - {}] 更新环境变量, 状态码: {}, 响应: {}", displayName, response.getStatus(), response.body()));
 
-    // 如果第二次更新依然失败，则抛出异常
-    if (response.getStatus() == HttpStatus.HTTP_INTERNAL_ERROR) {
-        throw new BizException("更新失败，请联系系统管理员");
+        // 如果第一次异常，第二次用id
+        if (response.getStatus() == HttpStatus.HTTP_INTERNAL_ERROR) {
+            envJo.remove("id");
+            envJo.put("_id", id);
+            log.debug(StrUtil.format("[青龙 - {}] 第二次尝试更新环境变量, 参数: {}", displayName, envJo.toJSONString()));
+            response = HttpRequest.put(qlConfig.getUrl().concat("open/envs"))
+                    .bearerAuth(this.getQLToken(displayName))
+                    .body(envJo.toJSONString())
+                    .execute();
+            log.debug(StrUtil.format("[青龙 - {}] 第二次尝试更新环境变量, 状态码: {}, 响应: {}", displayName, response.getStatus(), response.body()));
+        }
+        if (response.getStatus() == HttpStatus.HTTP_INTERNAL_ERROR) {
+            throw new BizException("更新失败，请联系系统管理员");
+        }
     }
-}
-
 
     public void enableEnv(QLConfig qlConfig, List<String> ids) {
         if (CollUtil.isEmpty(ids)) {
